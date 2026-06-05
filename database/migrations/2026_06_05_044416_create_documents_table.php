@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
-            $table->string('original_filename');
+            $table->string('file_name');
             $table->string('file_path');
             $table->integer('file_size')->nullable();
             $table->integer('page_count')->nullable();
-            $table->enum('status', ['processing', 'ready'])
+            $table->enum('status', ['processing', 'ready', 'failed'])
                 ->default('processing');
             $table->timestamps();
 
