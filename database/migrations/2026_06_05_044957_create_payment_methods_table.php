@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('type');
+            $table->string('card_brand')->nullable();
+            $table->string('last_four', 4)->nullable();
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
+
+            $table->index(['user_id', 'is_default']);
         });
     }
 

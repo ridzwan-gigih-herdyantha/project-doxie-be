@@ -13,8 +13,15 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('chat_session_id')->constrained('chat_sessions')->cascadeOnDelete();
+            $table->enum('role', ['user', 'assistant']);
+            $table->text('content');
+            $table->string('model_used')->nullable();
+            $table->timestamp('created_at')->nullable();
+
+            $table->index(['chat_session_id', 'created_at']);
         });
+
     }
 
     /**

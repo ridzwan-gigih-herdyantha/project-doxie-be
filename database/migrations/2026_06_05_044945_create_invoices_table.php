@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('subscription_id')->constrained()->cascadeOnDelete();
+            $table->decimal('amount', 10, 2);
+            $table->enum('status', ['paid', 'pending', 'failed'])->default('pending');
+            $table->timestamp('invoice_date')->nullable();
+            $table->timestamp('created_at')->nullable();
+
+            $table->index('status');
+            $table->index(['user_id', 'status']);
+            $table->index('invoice_date');
         });
     }
 

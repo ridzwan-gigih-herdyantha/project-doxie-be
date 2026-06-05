@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('chat_sessions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('document_id')->constrained()->cascadeOnDelete();
+            $table->string('title')->nullable();
             $table->timestamps();
+
+            $table->index(['user_id', 'document_id']);
+            $table->index(['user_id', 'updated_at']);
         });
     }
 
