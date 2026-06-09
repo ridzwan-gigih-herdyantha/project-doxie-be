@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('role', ['user', 'assistant']);
             $table->text('content');
             $table->string('model_used')->nullable();
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
 
             $table->index(['chat_session_id', 'created_at']);
         });

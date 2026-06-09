@@ -32,4 +32,9 @@ class Document extends Model
     {
         return $this->status === 'ready';
     }
+
+    public function chatSession(): HasMany
+    {
+        return $this->hasMany(ChatSession::class);
+    }
 }

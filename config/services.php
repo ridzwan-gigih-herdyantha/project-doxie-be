@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // OpenAI uses config/openai.php (openai-php SDK); Gemini uses config/gemini.php (gemini-php SDK).
+    // Anthropic has no SDK, so its credentials live here and are read directly by AnthropicProvider.
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY'),
+    ],
+
 ];

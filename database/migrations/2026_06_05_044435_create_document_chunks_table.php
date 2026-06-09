@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('document_id')->constrained()->cascadeOnDelete();
             $table->text('content');
             $table->integer('chunk_index');
-            $table->integer('token_count')->nullable();
             $table->vector('embedding', 1536);
             $table->timestamp('created_at')->nullable();
 
