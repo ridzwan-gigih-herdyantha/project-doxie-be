@@ -11,6 +11,7 @@ class DocumentChunk extends Model
         'document_id',
         'content',
         'chunk_index',
+        'token_count',
     ];
 
     public function document(): BelongsTo

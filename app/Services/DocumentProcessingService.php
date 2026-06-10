@@ -6,9 +6,17 @@ use App\Models\Document;
 use App\Models\DocumentChunk;
 use Illuminate\Support\Facades\DB;
 use Smalot\PdfParser\Parser;
+use Yethee\Tiktoken\EncoderProvider;
 
 class DocumentProcessingService
 {
+
+    private const TOKENIZER_MODEL = 'text-embedding-3-small';
+
+    private const CHUNK_TOKENS = 800;
+
+    private const CHUNK_OVERLAP_TOKENS = 100;
+
     public function __construct(
         private readonly EmbeddingService $embeddingService
     ) {}
@@ -21,15 +29,18 @@ class DocumentProcessingService
         $pageCount = count($pdf->getPages());
 
         $chunks = $this->chunkText($text);
-        $embeddings = $this->embeddingService->generateBatch($chunks);
+        $embeddings = $this->embeddingService->generateBatch(
+            array_column($chunks, 'content')
+        );
 
         foreach ($chunks as $index => $chunk) {
             $vector = $this->embeddingService->formatForPgvector($embeddings[$index]);
 
             DocumentChunk::insert([
                 'document_id' => $document->id,
-                'content' => $chunk,
+                'content' => $chunk['content'],
                 'chunk_index' => $index,
+                'token_count' => $chunk['token_count'],
                 'embedding' => DB::raw("'{$vector}'::vector"),
                 'created_at' => now(),
             ]);
@@ -41,22 +52,34 @@ class DocumentProcessingService
         ]);
     }
 
+    /**
+     * Split text into token-based chunks with overlap.
+     *
+     * @return array<int, array{content: string, token_count: int}>
+     */
     private function chunkText(string $text): array
     {
-        $chunkSize = 2000;
-        $overlap = 400;
+        $encoder = (new EncoderProvider)->getForModel(self::TOKENIZER_MODEL);
+        $tokens = $encoder->encode($text);
+        $total = count($tokens);
+
+        if ($total === 0) {
+            return [];
+        }
+
+        $step = self::CHUNK_TOKENS - self::CHUNK_OVERLAP_TOKENS;
         $chunks = [];
-        $start = 0;
-        $length = strlen($text);
 
-        while ($start < $length) {
-            $chunk = substr($text, $start, $chunkSize);
+        for ($start = 0; $start < $total; $start += $step) {
+            $slice = array_slice($tokens, $start, self::CHUNK_TOKENS);
+            $content = trim($encoder->decode($slice));
 
-            if (trim($chunk) !== '') {
-                $chunks[] = trim($chunk);
+            if ($content !== '') {
+                $chunks[] = [
+                    'content' => $content,
+                    'token_count' => count($slice),
+                ];
             }
-
-            $start += ($chunkSize - $overlap);
         }
 
         return $chunks;
