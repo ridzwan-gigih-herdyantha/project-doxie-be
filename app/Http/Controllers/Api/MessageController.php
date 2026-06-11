@@ -17,6 +17,25 @@ class MessageController extends Controller
 
     public function __construct(private readonly ChatService $chatService) {}
 
+    /**
+     * @OA\Get(
+     *     path="/api/session/{chatSession}/messages",
+     *     summary="List messages in a chat session",
+     *     tags={"Messages"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="chatSession",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(response=200, description="List of messages"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index(Request $request, ChatSession $chatSession): JsonResponse
     {
         abort_if($chatSession->user_id !== $request->user()->id, 403);
@@ -26,13 +45,51 @@ class MessageController extends Controller
         return $this->successResponse($messages);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/session/{chatSession}/messages",
+     *     summary="Send a question and stream the AI answer (SSE)",
+     *     description="Returns a text/event-stream. Each event is `data: {""content"": ""...""}` and the stream ends with `data: [DONE]`.",
+     *     tags={"Messages"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="chatSession",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\JsonContent(
+     *             required={"question", "model"},
+     *
+     *             @OA\Property(property="question", type="string", example="What is this document about?"),
+     *             @OA\Property(property="model", type="string", enum={"gpt-4o", "claude-3-5-sonnet-20241022", "gemini-2.5-flash"}, example="gpt-4o")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Server-sent events stream of the answer",
+     *
+     *         @OA\MediaType(mediaType="text/event-stream")
+     *     ),
+     *
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function store(Request $request, ChatSession $chatSession): StreamedResponse
     {
         abort_if($chatSession->user_id !== $request->user()->id, 403);
 
         $request->validate([
             'question' => 'required|string',
-            'model' => 'required|in:gpt-4o,claude-3-5-sonnet-20241022,gemini-1.5-flash',
+            'model' => 'required|in:gpt-4o,claude-3-5-sonnet-20241022,gemini-2.5-flash',
         ]);
 
         Message::create([

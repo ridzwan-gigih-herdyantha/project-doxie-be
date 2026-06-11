@@ -15,6 +15,25 @@ class ChatSessionController extends Controller
 
     public function __construct(private readonly ChatSessionService $chatsessionService) {}
 
+    /**
+     * @OA\Get(
+     *     path="/api/documents/{document}/session",
+     *     summary="List chat sessions for a document",
+     *     tags={"Chat Sessions"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="document",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(response=200, description="List of chat sessions"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index(Request $request, Document $document): JsonResponse
     {
         abort_if($document->user_id !== $request->user()->id, 403);
@@ -24,6 +43,26 @@ class ChatSessionController extends Controller
         return $this->successResponse($conversations);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/documents/{document}/session",
+     *     summary="Create a new chat session for a document",
+     *     tags={"Chat Sessions"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="document",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(response=201, description="Conversation created successfully"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=422, description="Document is still processing")
+     * )
+     */
     public function store(Request $request, Document $document): JsonResponse
     {
         abort_if($document->user_id !== $request->user()->id, 403);
