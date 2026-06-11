@@ -12,7 +12,7 @@ namespace App\Http\Controllers;
  * )
  *
  * @OA\Server(
- *     url="http://localhost:8000",
+ *     url=L5_SWAGGER_CONST_HOST,
  *     description="Local development server"
  * )
  *
