@@ -30,8 +30,23 @@ class ChatSessionController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *
-     *     @OA\Response(response=200, description="List of chat sessions"),
-     *     @OA\Response(response=403, description="Forbidden")
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of chat sessions",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/ChatSession"))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
      * )
      */
     public function index(Request $request, Document $document): JsonResponse
@@ -58,9 +73,32 @@ class ChatSessionController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *
-     *     @OA\Response(response=201, description="Conversation created successfully"),
-     *     @OA\Response(response=403, description="Forbidden"),
-     *     @OA\Response(response=422, description="Document is still processing")
+     *     @OA\Response(
+     *         response=201,
+     *         description="Conversation created successfully",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Conversation created successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/ChatSession")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Document is still processing",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Document is still processing.")
+     *         )
+     *     )
      * )
      */
     public function store(Request $request, Document $document): JsonResponse

@@ -22,8 +22,25 @@ class DocumentController extends Controller
      *     tags={"Documents"},
      *     security={{"sanctum":{}}},
      *
-     *     @OA\Response(response=200, description="List of documents"),
-     *     @OA\Response(response=401, description="Unauthenticated")
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of documents",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Document"))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
      * )
      */
     public function index(Request $request): JsonResponse
@@ -54,8 +71,23 @@ class DocumentController extends Controller
      *         )
      *     ),
      *
-     *     @OA\Response(response=201, description="Document uploaded successfully"),
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\Response(
+     *         response=201,
+     *         description="Document uploaded successfully",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Document uploaded successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Document")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
      * )
      */
     public function store(Request $request): JsonResponse
@@ -85,9 +117,32 @@ class DocumentController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *
-     *     @OA\Response(response=200, description="Document detail"),
-     *     @OA\Response(response=403, description="Forbidden"),
-     *     @OA\Response(response=404, description="Not found")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Document detail",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Document")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not found",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No query results for model [App\\Models\\Document] 1")
+     *         )
+     *     )
      * )
      */
     public function show(Request $request, Document $document): JsonResponse
@@ -112,9 +167,32 @@ class DocumentController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *
-     *     @OA\Response(response=200, description="Document deleted successfully"),
-     *     @OA\Response(response=403, description="Forbidden"),
-     *     @OA\Response(response=404, description="Not found")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Document deleted successfully",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Document deleted successfully"),
+     *             @OA\Property(property="data", type="object", nullable=true, example=null)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not found",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No query results for model [App\\Models\\Document] 1")
+     *         )
+     *     )
      * )
      */
     public function destroy(Request $request, Document $document): JsonResponse

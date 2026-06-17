@@ -33,8 +33,26 @@ class AuthController extends Controller
      *         )
      *     ),
      *
-     *     @OA\Response(response=201, description="Account created successfully"),
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\Response(
+     *         response=201,
+     *         description="Account created successfully",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Account created successfully"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", ref="#/components/schemas/User"),
+     *                 @OA\Property(property="token", type="string", example="1|AbCdEf0123456789TokenStringHere")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
      * )
      */
     public function register(Request $request): JsonResponse
@@ -67,9 +85,33 @@ class AuthController extends Controller
      *         )
      *     ),
      *
-     *     @OA\Response(response=200, description="Logged in successfully"),
-     *     @OA\Response(response=401, description="Invalid email or password"),
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logged in successfully",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Logged in successfully"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", ref="#/components/schemas/User"),
+     *                 @OA\Property(property="token", type="string", example="1|AbCdEf0123456789TokenStringHere")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid email or password",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
      * )
      */
     public function login(Request $request): JsonResponse
@@ -95,8 +137,25 @@ class AuthController extends Controller
      *     tags={"Auth"},
      *     security={{"sanctum":{}}},
      *
-     *     @OA\Response(response=200, description="Logged out successfully"),
-     *     @OA\Response(response=401, description="Unauthenticated")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logged out successfully",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Logged out successfully"),
+     *             @OA\Property(property="data", type="object", nullable=true, example=null)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
      * )
      */
     public function logout(Request $request): JsonResponse
@@ -113,8 +172,25 @@ class AuthController extends Controller
      *     tags={"Auth"},
      *     security={{"sanctum":{}}},
      *
-     *     @OA\Response(response=200, description="Authenticated user"),
-     *     @OA\Response(response=401, description="Unauthenticated")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Authenticated user",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="data", ref="#/components/schemas/User")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
      * )
      */
     public function me(Request $request): JsonResponse

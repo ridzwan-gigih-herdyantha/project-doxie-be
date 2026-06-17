@@ -32,8 +32,23 @@ class MessageController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *
-     *     @OA\Response(response=200, description="List of messages"),
-     *     @OA\Response(response=403, description="Forbidden")
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of messages",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Message"))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
      * )
      */
     public function index(Request $request, ChatSession $chatSession): JsonResponse
@@ -76,11 +91,34 @@ class MessageController extends Controller
      *         response=200,
      *         description="Server-sent events stream of the answer",
      *
-     *         @OA\MediaType(mediaType="text/event-stream")
+     *         @OA\MediaType(
+     *             mediaType="text/event-stream",
+     *
+     *             @OA\Schema(type="string", example="data: {""content"": ""This document ""}
+
+data: {""content"": ""is the 2025 ""}
+
+data: {""content"": ""annual report.""}
+
+data: [DONE]
+
+")
+     *         )
      *     ),
      *
-     *     @OA\Response(response=403, description="Forbidden"),
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
      * )
      */
     public function store(Request $request, ChatSession $chatSession): StreamedResponse
