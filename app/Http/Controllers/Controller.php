@@ -29,7 +29,7 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="John Doe"),
  *     @OA\Property(property="email", type="string", format="email", example="admin@doxie.ai"),
- *     @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, example=null),
+ *     @OA\Property(property="avatar_url", type="string", description="Auto-generated initial avatar as a base64-encoded SVG data URI", example="data:image/svg+xml;base64,PHN2ZyB4bWxucz0i..."),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2026-06-17T08:30:00.000000Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2026-06-17T08:30:00.000000Z")
  * )
