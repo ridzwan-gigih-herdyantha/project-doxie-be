@@ -156,6 +156,8 @@ data: [DONE]
                 'model_used' => $request->model,
             ]);
 
+            $this->chatService->generateTitle($chatSession);
+
             echo "data: [DONE]\n\n";
             ob_flush();
             flush();

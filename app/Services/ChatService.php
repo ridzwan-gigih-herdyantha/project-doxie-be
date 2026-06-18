@@ -5,9 +5,13 @@ namespace App\Services;
 use App\Models\ChatSession;
 use App\Services\LLM\LLMFactory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class ChatService
 {
+    private const TITLE_MODEL = 'gpt-4o-mini';
+
     public function __construct(
         private readonly EmbeddingService $embeddingService
     ) {}
@@ -42,5 +46,44 @@ Context:
         $provider = LLMFactory::make($model);
 
         return $provider->stream($systemPrompt, $messages, $onToken);
+    }
+
+    public function generateTitle(ChatSession $chatSession): void
+    {
+        if ($chatSession->title !== null) {
+            return;
+        }
+
+        $conversation = $chatSession->messages()
+            ->orderBy('created_at')
+            ->limit(2)
+            ->get()
+            ->map(fn ($msg) => ucfirst($msg->role).': '.$msg->content)
+            ->implode("\n\n");
+
+        if ($conversation === '') {
+            return;
+        }
+
+        $response = OpenAI::chat()->create([
+            'model' => self::TITLE_MODEL,
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'Create a short, descriptive title for the conversation below. '
+                                .'Return only the title, without quotes or explanation. '
+                                .'Maximum 6 words. '
+                                .'Use the dominant language of the conversation. '
+                                .'Avoid generic titles; summarize the main topic.',
+                ],
+                ['role' => 'user', 'content' => $conversation],
+            ],
+        ]);
+
+        $title = trim($response->choices[0]->message->content ?? '');
+
+        if ($title !== '') {
+            $chatSession->update(['title' => Str::limit($title, 100, '')]);
+        }
     }
 }
