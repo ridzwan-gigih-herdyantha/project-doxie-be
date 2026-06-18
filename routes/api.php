@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'index', 'store', 'show', 'destroy',
     ]);
 
+    Route::get('/session', [ChatSessionController::class, 'UserSession']);
     Route::get('documents/{document}/session', [ChatSessionController::class, 'index']);
     Route::post('documents/{document}/session', [ChatSessionController::class, 'store']);
 

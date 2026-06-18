@@ -15,6 +15,13 @@ class ChatSessionService
             ->get();
     }
 
+    public function getByUser(int $userId)
+    {
+        return ChatSession::where('user_id', $userId)
+            ->latest()
+            ->get();
+    }
+
     public function create(Document $document, int $userId): ChatSession
     {
         return ChatSession::create([

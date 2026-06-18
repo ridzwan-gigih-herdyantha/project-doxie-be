@@ -35,6 +35,7 @@ class ChatSessionController extends Controller
      *         description="List of chat sessions",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Success"),
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/ChatSession"))
@@ -59,6 +60,41 @@ class ChatSessionController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/session",
+     *     summary="List all chat sessions for the authenticated user",
+     *     tags={"Chat Sessions"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of chat sessions",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/ChatSession"))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     )
+     * )
+     */
+    public function UserSession(Request $request): JsonResponse
+    {
+
+        $conversations = $this->chatsessionService->getByUser($request->user()->id);
+
+        return $this->successResponse($conversations);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/documents/{document}/session",
      *     summary="Create a new chat session for a document",
@@ -78,6 +114,7 @@ class ChatSessionController extends Controller
      *         description="Conversation created successfully",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Conversation created successfully"),
      *             @OA\Property(property="data", ref="#/components/schemas/ChatSession")
@@ -96,6 +133,7 @@ class ChatSessionController extends Controller
      *         description="Document is still processing",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Document is still processing.")
      *         )
      *     )
