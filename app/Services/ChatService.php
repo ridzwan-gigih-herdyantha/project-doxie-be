@@ -29,7 +29,7 @@ class ChatService
         $context = collect($relevantChunks)->pluck('content')->implode("\n\n");
 
         $systemPrompt = "You are a helpful assistant. Answer questions based only on the following document context.
-If the answer is not found in the context, say you don't know.
+If the answer is not found in the context, say you don't know. Respond in the same language as the user's question.
 
 Context:
 {$context}";
