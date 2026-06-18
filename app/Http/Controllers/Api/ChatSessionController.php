@@ -61,7 +61,7 @@ class ChatSessionController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/session",
+     *     path="/api/sessions",
      *     summary="List all chat sessions for the authenticated user",
      *     tags={"Chat Sessions"},
      *     security={{"sanctum":{}}},
