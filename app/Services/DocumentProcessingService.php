@@ -26,6 +26,12 @@ class DocumentProcessingService
         $parser = new Parser;
         $pdf = $parser->parseContent($pdfContent);
         $text = $pdf->getText();
+
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+        $text = iconv('UTF-8', 'UTF-8//IGNORE', $text);
+
+        $text = preg_replace('/[^\P{C}\n\t]/u', '', $text);
+
         $pageCount = count($pdf->getPages());
 
         $chunks = $this->chunkText($text);
@@ -60,6 +66,10 @@ class DocumentProcessingService
     private function chunkText(string $text): array
     {
         $encoder = (new EncoderProvider)->getForModel(self::TOKENIZER_MODEL);
+
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+        $text = iconv('UTF-8', 'UTF-8//IGNORE', $text);
+
         $tokens = $encoder->encode($text);
         $total = count($tokens);
 
