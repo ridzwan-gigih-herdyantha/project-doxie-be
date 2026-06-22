@@ -89,28 +89,59 @@ class DocumentProcessingService
      */
     private function chunkText(string $text): array
     {
-        $encoder = (new EncoderProvider)->getForModel(self::TOKENIZER_MODEL);
+        $encoder = (new EncoderProvider)
+            ->getForModel(self::TOKENIZER_MODEL);
 
-        $tokens = $encoder->encode($text);
-        $total = count($tokens);
+        $sentences = preg_split(
+            '/(?<=[.!?])\s+/',
+            $text,
+            -1,
+            PREG_SPLIT_NO_EMPTY
+        );
 
-        if ($total === 0) {
-            return [];
-        }
-
-        $step = self::CHUNK_TOKENS - self::CHUNK_OVERLAP_TOKENS;
         $chunks = [];
 
-        for ($start = 0; $start < $total; $start += $step) {
-            $slice = array_slice($tokens, $start, self::CHUNK_TOKENS);
-            $content = trim($encoder->decode($slice));
+        $currentText = '';
+        $currentTokens = [];
 
-            if ($content !== '') {
-                $chunks[] = [
-                    'content' => $content,
-                    'token_count' => count($slice),
-                ];
+        foreach ($sentences as $sentence) {
+
+            $sentenceTokens = $encoder->encode($sentence);
+
+            if (
+                count($currentTokens) + count($sentenceTokens)
+                > self::CHUNK_TOKENS
+            ) {
+
+                if ($currentText !== '') {
+                    $chunks[] = [
+                        'content' => trim($currentText),
+                        'token_count' => count($currentTokens),
+                    ];
+                }
+
+                $overlapTokens = array_slice(
+                    $currentTokens,
+                    -self::CHUNK_OVERLAP_TOKENS
+                );
+
+                $currentTokens = $overlapTokens;
+                $currentText = $encoder->decode($overlapTokens);
             }
+
+            $currentText .= ' ' . $sentence;
+
+            $currentTokens = array_merge(
+                $currentTokens,
+                $sentenceTokens
+            );
+        }
+
+        if ($currentText !== '') {
+            $chunks[] = [
+                'content' => trim($currentText),
+                'token_count' => count($currentTokens),
+            ];
         }
 
         return $chunks;
