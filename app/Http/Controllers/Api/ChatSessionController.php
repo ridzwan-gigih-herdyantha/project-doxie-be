@@ -30,24 +30,6 @@ class ChatSessionController extends Controller
      *         @OA\Schema(type="string", format="uuid")
      *     ),
      *
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         required=false,
-     *         description="Number of sessions per page (default 10)",
-     *
-     *         @OA\Schema(type="integer", default=10)
-     *     ),
-     *
-     *     @OA\Parameter(
-     *         name="cursor",
-     *         in="query",
-     *         required=false,
-     *         description="Cursor for the next/previous page (from next_cursor / prev_cursor)",
-     *
-     *         @OA\Schema(type="string")
-     *     ),
-     *
      *     @OA\Response(
      *         response=200,
      *         description="List of chat sessions",
@@ -72,9 +54,7 @@ class ChatSessionController extends Controller
     {
         abort_if($document->user_id !== $request->user()->id, 403);
 
-        $perPage = (int) $request->integer('per_page', 10);
-
-        $conversations = $this->chatsessionService->getByDocument($document->id, $request->user()->id, $perPage);
+        $conversations = $this->chatsessionService->getByDocument($document->id, $request->user()->id);
 
         return $this->successResponse($conversations);
     }
@@ -85,24 +65,6 @@ class ChatSessionController extends Controller
      *     summary="List all chat sessions for the authenticated user",
      *     tags={"Chat Sessions"},
      *     security={{"sanctum":{}}},
-     *
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         required=false,
-     *         description="Number of sessions per page (default 10)",
-     *
-     *         @OA\Schema(type="integer", default=10)
-     *     ),
-     *
-     *     @OA\Parameter(
-     *         name="cursor",
-     *         in="query",
-     *         required=false,
-     *         description="Cursor for the next/previous page (from next_cursor / prev_cursor)",
-     *
-     *         @OA\Schema(type="string")
-     *     ),
      *
      *     @OA\Response(
      *         response=200,
@@ -126,9 +88,7 @@ class ChatSessionController extends Controller
      */
     public function UserSession(Request $request): JsonResponse
     {
-        $perPage = (int) $request->integer('per_page', 10);
-
-        $conversations = $this->chatsessionService->getByUser($request->user()->id, $perPage);
+        $conversations = $this->chatsessionService->getByUser($request->user()->id);
 
         return $this->successResponse($conversations);
     }

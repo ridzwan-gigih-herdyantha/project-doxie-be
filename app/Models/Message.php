@@ -11,20 +11,13 @@ class Message extends Model
 {
     use HasFactory, HasPublicUuid;
 
+    protected $touches = ['conversation'];
     protected $fillable = ['chat_session_id', 'role', 'content', 'model_used'];
 
     /**
      * @var list<string>
      */
     protected $hidden = ['id', 'chat_session_id'];
-
-    /**
-     * Keep the parent chat session's `updated_at` in sync so it reflects the
-     * last activity timestamp used for cursor-based ordering.
-     *
-     * @var list<string>
-     */
-    protected $touches = ['conversation'];
 
     public function conversation(): BelongsTo
     {

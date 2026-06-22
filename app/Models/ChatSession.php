@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\HasPublicUuid;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,18 +33,6 @@ class ChatSession extends Model
         return Attribute::make(
             get: fn (): ?string => $this->document?->uuid,
         );
-    }
-
-    /**
-     * Order by last activity using real columns so the query is compatible
-     * with cursor pagination. `updated_at` is kept current by the Message
-     * model touching its parent session; `id` breaks ties deterministically.
-     */
-    public function scopeOrderByLastActivity(Builder $query): Builder
-    {
-        return $query
-            ->orderByDesc('updated_at')
-            ->orderByDesc('id');
     }
 
     public function user(): BelongsTo

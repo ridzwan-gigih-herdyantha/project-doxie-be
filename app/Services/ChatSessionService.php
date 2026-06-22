@@ -8,21 +8,23 @@ use Illuminate\Contracts\Pagination\CursorPaginator;
 
 class ChatSessionService
 {
-    public function getByDocument(int $documentId, int $userId, int $perPage = 10): CursorPaginator
+   
+    public function getByDocument(int $documentId, int $userId): CursorPaginator 
     {
         return ChatSession::with('document:id,uuid')
             ->where('document_id', $documentId)
             ->where('user_id', $userId)
-            ->orderByLastActivity()
-            ->cursorPaginate($perPage);
+            ->latest('updated_at') 
+            ->cursorPaginate(10);
     }
 
-    public function getByUser(int $userId, int $perPage = 10): CursorPaginator
+
+    public function getByUser(int $userId): CursorPaginator
     {
         return ChatSession::with('document:id,uuid')
             ->where('user_id', $userId)
-            ->orderByLastActivity()
-            ->cursorPaginate($perPage);
+            ->latest('updated_at') 
+            ->cursorPaginate(10);
     }
 
     public function create(Document $document, int $userId): ChatSession
