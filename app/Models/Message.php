@@ -28,6 +28,6 @@ class Message extends Model
 
     public function conversation(): BelongsTo
     {
-        return $this->belongsTo(ChatSession::class);
+        return $this->belongsTo(ChatSession::class, 'chat_session_id');
     }
 }
