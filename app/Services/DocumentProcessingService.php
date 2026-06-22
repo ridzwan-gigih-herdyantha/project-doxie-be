@@ -27,14 +27,38 @@ class DocumentProcessingService
         $pdf = $parser->parseContent($pdfContent);
         $text = $pdf->getText();
 
-        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
-        $text = iconv('UTF-8', 'UTF-8//IGNORE', $text);
-
-        $text = preg_replace('/[^\P{C}\n\t]/u', '', $text);
+        $text = mb_convert_encoding(
+            $text,
+            'UTF-8',
+            'UTF-8'
+        );
+        
+        $text = iconv(
+            'UTF-8',
+            'UTF-8//IGNORE',
+            $text
+        );
+        
+        $text = preg_replace(
+            '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u',
+            '',
+            $text
+        );
 
         $pageCount = count($pdf->getPages());
 
         $chunks = $this->chunkText($text);
+
+        $chunks = array_values(array_filter(
+            $chunks,
+            function ($chunk) {
+                return mb_check_encoding(
+                    $chunk['content'],
+                    'UTF-8'
+                );
+            }
+        ));
+
         $embeddings = $this->embeddingService->generateBatch(
             array_column($chunks, 'content')
         );
@@ -66,9 +90,6 @@ class DocumentProcessingService
     private function chunkText(string $text): array
     {
         $encoder = (new EncoderProvider)->getForModel(self::TOKENIZER_MODEL);
-
-        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
-        $text = iconv('UTF-8', 'UTF-8//IGNORE', $text);
 
         $tokens = $encoder->encode($text);
         $total = count($tokens);
