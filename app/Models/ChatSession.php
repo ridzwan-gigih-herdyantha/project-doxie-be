@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ChatSession extends Model
 {
     protected $fillable = ['user_id', 'document_id', 'title'];
+
+    public function scopeOrderByLastActivity(Builder $query): Builder
+    {
+        return $query
+            ->withMax('messages', 'created_at')
+            ->orderByRaw('COALESCE(messages_max_created_at, chat_sessions.created_at) DESC');
+    }
 
     public function user(): BelongsTo
     {
