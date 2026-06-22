@@ -18,6 +18,14 @@ class Message extends Model
      */
     protected $hidden = ['id', 'chat_session_id'];
 
+    /**
+     * Keep the parent chat session's `updated_at` in sync so it reflects the
+     * last activity timestamp used for cursor-based ordering.
+     *
+     * @var list<string>
+     */
+    protected $touches = ['conversation'];
+
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(ChatSession::class);

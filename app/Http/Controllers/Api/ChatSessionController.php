@@ -40,11 +40,12 @@ class ChatSessionController extends Controller
      *     ),
      *
      *     @OA\Parameter(
-     *         name="page",
+     *         name="cursor",
      *         in="query",
      *         required=false,
+     *         description="Cursor for the next/previous page (from next_cursor / prev_cursor)",
      *
-     *         @OA\Schema(type="integer", default=1)
+     *         @OA\Schema(type="string")
      *     ),
      *
      *     @OA\Response(
@@ -95,11 +96,12 @@ class ChatSessionController extends Controller
      *     ),
      *
      *     @OA\Parameter(
-     *         name="page",
+     *         name="cursor",
      *         in="query",
      *         required=false,
+     *         description="Cursor for the next/previous page (from next_cursor / prev_cursor)",
      *
-     *         @OA\Schema(type="integer", default=1)
+     *         @OA\Schema(type="string")
      *     ),
      *
      *     @OA\Response(

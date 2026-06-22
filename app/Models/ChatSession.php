@@ -36,16 +36,16 @@ class ChatSession extends Model
         );
     }
 
+    /**
+     * Order by last activity using real columns so the query is compatible
+     * with cursor pagination. `updated_at` is kept current by the Message
+     * model touching its parent session; `id` breaks ties deterministically.
+     */
     public function scopeOrderByLastActivity(Builder $query): Builder
     {
         return $query
-            ->orderByDesc(
-                Message::select('created_at')
-                    ->whereColumn('messages.chat_session_id', 'chat_sessions.id')
-                    ->latest()
-                    ->take(1)
-            )
-            ->latest();
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id');
     }
 
     public function user(): BelongsTo
