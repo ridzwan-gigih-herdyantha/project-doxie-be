@@ -14,8 +14,13 @@ class ChatSession extends Model
     public function scopeOrderByLastActivity(Builder $query): Builder
     {
         return $query
-            ->withMax('messages', 'created_at')
-            ->orderByRaw('COALESCE(messages_max_created_at, chat_sessions.created_at) DESC');
+            ->orderByDesc(
+                Message::select('created_at')
+                    ->whereColumn('messages.chat_session_id', 'chat_sessions.id')
+                    ->latest()
+                    ->take(1)
+            )
+            ->latest();
     }
 
     public function user(): BelongsTo
