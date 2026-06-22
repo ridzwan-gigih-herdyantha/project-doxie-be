@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\DocumentReady;
 use App\Models\Document;
 use App\Models\DocumentChunk;
 use Illuminate\Support\Facades\DB;
@@ -80,6 +81,7 @@ class DocumentProcessingService
             'status' => 'ready',
             'page_count' => $pageCount,
         ]);
+        DocumentReady::dispatch($document);
     }
 
     /**

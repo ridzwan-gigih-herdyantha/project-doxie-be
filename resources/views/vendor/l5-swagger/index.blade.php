@@ -81,5 +81,124 @@
     </rapi-doc>
 
     <script type="module" src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"></script>
+
+    {{-- Realtime push (Reverb) toast demo --}}
+    <style>
+        #rt-toast-wrap {
+            position: fixed; top: 16px; right: 16px; z-index: 99999;
+            display: flex; flex-direction: column; gap: 10px; max-width: 360px;
+        }
+        .rt-toast {
+            font: 500 13px 'Inter', sans-serif; color: #fff;
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            border-radius: 10px; padding: 12px 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
+            opacity: 0; transform: translateX(20px);
+            transition: opacity .25s ease, transform .25s ease;
+        }
+        .rt-toast.show { opacity: 1; transform: translateX(0); }
+        .rt-toast.warn { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); }
+        .rt-toast .t-title { font-weight: 700; margin-bottom: 2px; }
+        .rt-toast .t-body { opacity: .95; font-weight: 400; }
+        #rt-status {
+            position: fixed; bottom: 12px; right: 12px; z-index: 99999;
+            font: 500 11px 'Inter', sans-serif; color: #6b7280;
+            background: #fff; border: 1px solid #e5e7eb; border-radius: 999px;
+            padding: 4px 10px; display: flex; align-items: center; gap: 6px;
+        }
+        #rt-status .dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; }
+        #rt-status.on .dot { background: #10b981; }
+    </style>
+    <div id="rt-toast-wrap"></div>
+    <div id="rt-status"><span class="dot"></span><span class="txt">Realtime: idle (authorize & hit an endpoint)</span></div>
+
+    <script src="https://js.pusher.com/8.4/pusher.min.js"></script>
+    <script>
+        (function () {
+            const CONFIG = {
+                key: @json(config('broadcasting.connections.reverb.key')),
+                host: @json(config('broadcasting.connections.reverb.options.host')),
+                port: @json((int) config('broadcasting.connections.reverb.options.port')),
+                scheme: @json(config('broadcasting.connections.reverb.options.scheme')),
+            };
+
+            function toast(title, body, warn) {
+                const wrap = document.getElementById('rt-toast-wrap');
+                const el = document.createElement('div');
+                el.className = 'rt-toast' + (warn ? ' warn' : '');
+                el.innerHTML = '<div class="t-title">' + title + '</div><div class="t-body">' + body + '</div>';
+                wrap.appendChild(el);
+                requestAnimationFrame(() => el.classList.add('show'));
+                setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 6000);
+            }
+
+            function setStatus(text, on) {
+                const s = document.getElementById('rt-status');
+                s.querySelector('.txt').textContent = 'Realtime: ' + text;
+                s.classList.toggle('on', !!on);
+            }
+
+            let started = false;
+
+            async function start(token) {
+                if (started) { return; }
+                started = true;
+                setStatus('connecting…');
+
+                let uuid;
+                try {
+                    const res = await fetch('/api/auth/user', {
+                        headers: { Authorization: token, Accept: 'application/json' },
+                    });
+                    const json = await res.json();
+                    uuid = (json.data && json.data.uuid) || json.uuid;
+                } catch (e) {
+                    started = false;
+                    setStatus('failed to load user');
+                    return;
+                }
+                if (!uuid) { started = false; setStatus('no user uuid'); return; }
+
+                const pusher = new Pusher(CONFIG.key, {
+                    wsHost: CONFIG.host,
+                    wsPort: CONFIG.port,
+                    wssPort: CONFIG.port,
+                    forceTLS: CONFIG.scheme === 'https',
+                    enabledTransports: ['ws', 'wss'],
+                    disableStats: true,
+                    cluster: 'mt1',
+                    authEndpoint: '/broadcasting/auth',
+                    auth: { headers: { Authorization: token, Accept: 'application/json' } },
+                });
+
+                pusher.connection.bind('connected', () => setStatus('connected', true));
+                pusher.connection.bind('error', () => setStatus('connection error'));
+
+                const channel = pusher.subscribe('private-user.' + uuid);
+                channel.bind('pusher:subscription_succeeded', () => {
+                    setStatus('listening (user.' + uuid.slice(0, 8) + '…)', true);
+                    toast('Realtime aktif', 'Menunggu event document.ready…');
+                });
+                channel.bind('pusher:subscription_error', (e) => {
+                    setStatus('subscribe denied (' + (e && e.status) + ')');
+                    toast('Subscribe ditolak', 'Auth gagal (status ' + (e && e.status) + ')', true);
+                });
+                channel.bind('document.ready', (data) => {
+                    toast('📄 Dokumen siap', (data.title || 'Untitled') + ' — ' + (data.status || 'ready'));
+                });
+            }
+
+            // Capture the Bearer token the moment any "Try" request is sent from RapiDoc.
+            const rapidoc = document.querySelector('rapi-doc');
+            if (rapidoc) {
+                rapidoc.addEventListener('before-try', (e) => {
+                    try {
+                        const auth = e.detail.request.headers.get('Authorization');
+                        if (auth && auth.toLowerCase().startsWith('bearer')) { start(auth); }
+                    } catch (_) {}
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
