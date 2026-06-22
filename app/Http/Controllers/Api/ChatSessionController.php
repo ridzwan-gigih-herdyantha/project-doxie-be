@@ -27,7 +27,7 @@ class ChatSessionController extends Controller
      *         in="path",
      *         required=true,
      *
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *
      *     @OA\Parameter(
@@ -143,7 +143,7 @@ class ChatSessionController extends Controller
      *         in="path",
      *         required=true,
      *
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *
      *     @OA\Response(

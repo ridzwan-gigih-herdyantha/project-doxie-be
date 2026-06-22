@@ -27,6 +27,7 @@ class DocumentController extends Controller
      *         description="List of documents",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Success"),
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Document"))
@@ -38,6 +39,7 @@ class DocumentController extends Controller
      *         description="Unauthenticated",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated.")
      *         )
      *     )
@@ -76,6 +78,7 @@ class DocumentController extends Controller
      *         description="Document uploaded successfully",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Document uploaded successfully"),
      *             @OA\Property(property="data", ref="#/components/schemas/Document")
@@ -114,7 +117,7 @@ class DocumentController extends Controller
      *         in="path",
      *         required=true,
      *
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *
      *     @OA\Response(
@@ -122,6 +125,7 @@ class DocumentController extends Controller
      *         description="Document detail",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Success"),
      *             @OA\Property(property="data", ref="#/components/schemas/Document")
@@ -140,6 +144,7 @@ class DocumentController extends Controller
      *         description="Not found",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="No query results for model [App\\Models\\Document] 1")
      *         )
      *     )
@@ -164,7 +169,7 @@ class DocumentController extends Controller
      *         in="path",
      *         required=true,
      *
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *
      *     @OA\Response(
@@ -172,6 +177,7 @@ class DocumentController extends Controller
      *         description="Document deleted successfully",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Document deleted successfully"),
      *             @OA\Property(property="data", type="object", nullable=true, example=null)
@@ -190,6 +196,7 @@ class DocumentController extends Controller
      *         description="Not found",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="No query results for model [App\\Models\\Document] 1")
      *         )
      *     )

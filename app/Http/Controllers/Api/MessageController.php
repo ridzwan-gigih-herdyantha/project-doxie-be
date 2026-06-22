@@ -29,7 +29,7 @@ class MessageController extends Controller
      *         in="path",
      *         required=true,
      *
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *
      *     @OA\Response(
@@ -37,6 +37,7 @@ class MessageController extends Controller
      *         description="List of messages",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Success"),
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Message"))
@@ -73,7 +74,7 @@ class MessageController extends Controller
      *         in="path",
      *         required=true,
      *
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *
      *     @OA\RequestBody(
@@ -94,15 +95,7 @@ class MessageController extends Controller
      *         @OA\MediaType(
      *             mediaType="text/event-stream",
      *
-     *             @OA\Schema(type="string", example="data: {""content"": ""This document ""}
-
-data: {""content"": ""is the 2025 ""}
-
-data: {""content"": ""annual report.""}
-
-data: [DONE]
-
-")
+     *             @OA\Schema(type="string", example="data: {""content"": ""This document ""}\n\ndata: {""content"": ""is the 2025 ""}\n\ndata: {""content"": ""annual report.""}\n\ndata: [DONE]\n\n")
      *         )
      *     ),
      *

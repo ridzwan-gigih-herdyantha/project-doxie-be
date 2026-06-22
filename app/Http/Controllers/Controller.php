@@ -26,7 +26,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="User",
  *
- *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="uuid", type="string", format="uuid", example="9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"),
  *     @OA\Property(property="name", type="string", example="John Doe"),
  *     @OA\Property(property="email", type="string", format="email", example="admin@doxie.ai"),
  *     @OA\Property(property="avatar_url", type="string", description="Auto-generated initial avatar as a base64-encoded SVG data URI", example="data:image/svg+xml;base64,PHN2ZyB4bWxucz0i..."),
@@ -37,8 +37,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="Document",
  *
- *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="user_id", type="integer", example=1),
+ *     @OA\Property(property="uuid", type="string", format="uuid", example="9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"),
  *     @OA\Property(property="title", type="string", example="Annual Report 2025"),
  *     @OA\Property(property="file_name", type="string", example="annual-report-2025.pdf"),
  *     @OA\Property(property="file_path", type="string", example="documents/1/annual-report-2025.pdf"),
@@ -53,9 +52,8 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="ChatSession",
  *
- *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="user_id", type="integer", example=1),
- *     @OA\Property(property="document_id", type="integer", example=1),
+ *     @OA\Property(property="uuid", type="string", format="uuid", example="9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"),
+ *     @OA\Property(property="document_uuid", type="string", format="uuid", nullable=true, example="3f2504e0-4f89-41d3-9a0c-0305e82c3301"),
  *     @OA\Property(property="title", type="string", example="Chat about Annual Report 2025"),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2026-06-17T08:30:00.000000Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2026-06-17T08:30:00.000000Z")
@@ -64,8 +62,7 @@ namespace App\Http\Controllers;
  * @OA\Schema(
  *     schema="Message",
  *
- *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="chat_session_id", type="integer", example=1),
+ *     @OA\Property(property="uuid", type="string", format="uuid", example="9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"),
  *     @OA\Property(property="role", type="string", enum={"user", "assistant"}, example="assistant"),
  *     @OA\Property(property="content", type="string", example="This document is the 2025 annual report covering financial performance and outlook."),
  *     @OA\Property(property="model_used", type="string", nullable=true, example="gpt-4o"),
