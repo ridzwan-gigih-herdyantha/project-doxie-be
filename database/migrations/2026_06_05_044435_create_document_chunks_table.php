@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('content');
             $table->integer('chunk_index');
             $table->integer('token_count')->nullable();
+            $table->integer('page_number')->nullable();
 
             if ($isPostgres) {
                 $table->vector('embedding', 1536);

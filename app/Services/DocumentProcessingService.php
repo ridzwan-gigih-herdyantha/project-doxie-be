@@ -26,29 +26,20 @@ class DocumentProcessingService
     {
         $parser = new Parser;
         $pdf = $parser->parseContent($pdfContent);
-        $text = $pdf->getText();
+        $pages = $pdf->getPages();
 
-        $text = mb_convert_encoding(
-            $text,
-            'UTF-8',
-            'UTF-8'
-        );
-        
-        $text = iconv(
-            'UTF-8',
-            'UTF-8//IGNORE',
-            $text
-        );
-        
-        $text = preg_replace(
-            '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u',
-            '',
-            $text
-        );
+        $pageCount = count($pages);
 
-        $pageCount = count($pdf->getPages());
+        $chunks = [];
 
-        $chunks = $this->chunkText($text);
+        foreach ($pages as $pageIndex => $page) {
+            $text = $this->sanitizeText($page->getText());
+
+            foreach ($this->chunkText($text) as $chunk) {
+                $chunk['page_number'] = $pageIndex + 1;
+                $chunks[] = $chunk;
+            }
+        }
 
         $chunks = array_values(array_filter(
             $chunks,
@@ -72,7 +63,9 @@ class DocumentProcessingService
                 'content' => $chunk['content'],
                 'chunk_index' => $index,
                 'token_count' => $chunk['token_count'],
+                'page_number' => $chunk['page_number'],
                 'embedding' => DB::raw("'{$vector}'::vector"),
+
                 'created_at' => now(),
             ]);
         }
@@ -84,8 +77,28 @@ class DocumentProcessingService
         DocumentReady::dispatch($document);
     }
 
+    private function sanitizeText(string $text): string
+    {
+        $text = mb_convert_encoding(
+            $text,
+            'UTF-8',
+            'UTF-8'
+        );
+
+        $text = iconv(
+            'UTF-8',
+            'UTF-8//IGNORE',
+            $text
+        );
+
+        return preg_replace(
+            '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u',
+            '',
+            $text
+        );
+    }
+
     /**
-     * Split text into token-based chunks with overlap.
      *
      * @return array<int, array{content: string, token_count: int}>
      */
@@ -131,7 +144,7 @@ class DocumentProcessingService
                 $currentText = $encoder->decode($overlapTokens);
             }
 
-            $currentText .= ' ' . $sentence;
+            $currentText .= ' '.$sentence;
 
             $currentTokens = array_merge(
                 $currentTokens,

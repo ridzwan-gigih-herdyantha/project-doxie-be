@@ -22,14 +22,17 @@ class ChatService
         $vector = $this->embeddingService->formatForPgvector($queryEmbedding);
 
         $relevantChunks = DB::select(
-            'SELECT content FROM document_chunks WHERE document_id = ? ORDER BY embedding <=> ?::vector LIMIT 5',
+            'SELECT content, page_number FROM document_chunks WHERE document_id = ? ORDER BY embedding <=> ?::vector LIMIT 5',
             [$chatSession->document_id, $vector]
         );
 
-        $context = collect($relevantChunks)->pluck('content')->implode("\n\n");
+        $context = collect($relevantChunks)
+            ->map(fn ($chunk) => "[Page {$chunk->page_number}]\n{$chunk->content}")
+            ->implode("\n\n");
 
         $systemPrompt = "You are a helpful assistant. Answer questions based only on the following document context.
 If the answer is not found in the context, say you don't know. Always respond in the same language as the user's question, including when you don't know the answer.
+When relevant, cite the page number(s) the answer comes from.
 
 Context:
 {$context}";
