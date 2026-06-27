@@ -18,13 +18,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'avatar',
     ];
 
     protected $hidden = [
         'id',
         'password',
         'remember_token',
+        'avatar',
     ];
 
     protected $appends = ['avatar_url'];
@@ -39,6 +39,10 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute(): string
     {
+        if (! empty($this->avatar)) {
+            return $this->avatar;
+        }
+
         $initial = Str::upper(Str::substr(trim($this->name), 0, 1)) ?: 'U';
 
         $palette = [
@@ -52,7 +56,7 @@ class User extends Authenticatable
         <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
             <circle cx="64" cy="64" r="64" fill="{$bg}"/>
             <text x="50%" y="50%" dy=".1em" fill="#ffffff" font-family="Arial, sans-serif"
-                  font-size="56" font-weight="600" text-anchor="middle" dominant-baseline="middle">{$initial}</text>
+                font-size="56" font-weight="600" text-anchor="middle" dominant-baseline="middle">{$initial}</text>
         </svg>
         SVG;
 
