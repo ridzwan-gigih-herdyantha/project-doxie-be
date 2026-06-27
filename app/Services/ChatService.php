@@ -32,7 +32,7 @@ class ChatService
 
         $systemPrompt = "You are a helpful assistant. Answer questions based only on the following document context.
 If the answer is not found in the context, say you don't know. Always respond in the same language as the user's question, including when you don't know the answer.
-When relevant, cite the page number(s) the answer comes from.
+When relevant, cite the page number(s) the answer comes from using square brackets, like [page 12]. Never use parentheses, like (page 12).
 
 Context:
 {$context}";
