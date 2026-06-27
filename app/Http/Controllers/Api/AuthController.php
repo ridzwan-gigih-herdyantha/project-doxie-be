@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Services\AuthService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -38,6 +41,7 @@ class AuthController extends Controller
      *         description="Account created successfully",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Account created successfully"),
      *             @OA\Property(property="data", type="object",
@@ -90,6 +94,7 @@ class AuthController extends Controller
      *         description="Logged in successfully",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Logged in successfully"),
      *             @OA\Property(property="data", type="object",
@@ -142,6 +147,7 @@ class AuthController extends Controller
      *         description="Logged out successfully",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Logged out successfully"),
      *             @OA\Property(property="data", type="object", nullable=true, example=null)
@@ -153,6 +159,7 @@ class AuthController extends Controller
      *         description="Unauthenticated",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated.")
      *         )
      *     )
@@ -177,6 +184,7 @@ class AuthController extends Controller
      *         description="Authenticated user",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Success"),
      *             @OA\Property(property="data", ref="#/components/schemas/User")
@@ -188,6 +196,7 @@ class AuthController extends Controller
      *         description="Unauthenticated",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated.")
      *         )
      *     )
@@ -196,5 +205,45 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return $this->successResponse($request->user());
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/auth/google/redirect",
+     *     summary="Redirect to Google's OAuth consent screen",
+     *     tags={"Auth"},
+     *
+     *     @OA\Response(response=302, description="Redirect to Google")
+     * )
+     */
+    public function redirectToGoogle(): RedirectResponse
+    {
+        return Socialite::driver('google')->stateless()->redirect();
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/auth/google/callback",
+     *     summary="Handle the Google OAuth callback",
+     *     tags={"Auth"},
+     *
+     *     @OA\Response(response=302, description="Redirect back to the frontend with an access token")
+     * )
+     */
+    public function handleGoogleCallback(): RedirectResponse
+    {
+        $appUrl = rtrim((string) config('services.google.app_redirect'), '/');
+
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+        } catch (Throwable) {
+            return redirect()->away($appUrl.'/auth/callback?error=oauth_failed');
+        }
+
+        $result = $this->authService->loginWithGoogle($googleUser);
+
+        return redirect()->away(
+            $appUrl.'/auth/callback?token='.urlencode($result['token'])
+        );
     }
 }

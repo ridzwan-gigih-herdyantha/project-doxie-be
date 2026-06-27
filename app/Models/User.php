@@ -14,9 +14,11 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, HasPublicUuid, Notifiable;
 
     protected $fillable = [
+        'google_id',
         'name',
         'email',
         'password',
+        'avatar',
     ];
 
     protected $hidden = [

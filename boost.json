@@ -10,6 +10,8 @@
     "sail": false,
     "skills": [
         "laravel-best-practices",
+        "socialite-development",
+        "echo-development",
         "tailwindcss-development"
     ]
 }
